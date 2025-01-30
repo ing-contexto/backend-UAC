@@ -11,4 +11,8 @@ export default class MunicipalityRepository {
   async getMunicipality(munId: number): Promise<Municipality | null> {
     return this.municipalityDatasource.getMunicipality(munId);
   }
+
+  async getMunicipalities(munIds: number[]): Promise<Municipality[]> {
+    return this.municipalityDatasource.getMunicipalities(munIds);
+  }
 }

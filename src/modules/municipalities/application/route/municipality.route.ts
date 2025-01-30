@@ -11,8 +11,14 @@ const repository = new MunicipalityRepository(datasource);
 const municipalityController = new MunicipalityController(repository);
 
 municipalityRouter.post("/api/v1/municipalities/get-mun", async (req, res) => {
-  console.log("si");
   municipalityController.getMunicipality(req, res);
 });
+
+municipalityRouter.post(
+  "/api/v1/municipalities/get-muninipalities",
+  async (req, res) => {
+    municipalityController.getMunicipalities(req, res);
+  }
+);
 
 export default municipalityRouter;

@@ -21,6 +21,7 @@ server.use(
   })
 );
 server.use(express.json());
+
 server.use(municipalityRouter);
 
 export default server;
