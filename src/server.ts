@@ -11,7 +11,7 @@ declare global {
 }
 
 const server = express();
-server.set("port", parseInt(process.env.PORT || "3000"));
+server.set("port", parseInt(process.env.PORT || "8080"));
 
 server.use(
   cors({
