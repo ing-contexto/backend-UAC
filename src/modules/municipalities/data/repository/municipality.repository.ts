@@ -13,6 +13,30 @@ export default class MunicipalityRepository {
   }
 
   async getMunicipalities(munIds: number[]): Promise<Municipality[]> {
-    return this.municipalityDatasource.getMunicipalities(munIds);
+    const mun: Municipality[] = await this.municipalityDatasource.getMunicipalities(munIds);
+    const municipiosMap = new Map<string, Municipality>();
+
+    mun.forEach(m => {
+      if (!municipiosMap.has(m.nombre)) {
+        municipiosMap.set(m.nombre, {
+          id: m.id,
+          nombre: m.nombre,
+          distrito: m.distrito,
+          region: m.region,
+          colindantes: []
+        });
+      }
+
+      const municipio = municipiosMap.get(m.nombre)!;
+      if (m.colindantes) {
+        const colindantes = Array.isArray(m.colindantes) ? m.colindantes : [m.colindantes];
+        (municipio.colindantes as String[]).push(...colindantes);
+      }
+    });
+    const result: Municipality[] = Array.from(municipiosMap.values());
+
+    return result;
   }
+
+
 }

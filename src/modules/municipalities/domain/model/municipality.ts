@@ -3,4 +3,5 @@ export default interface Municipality {
   nombre: string;
   distrito: string;
   region: string;
+  colindantes?: string[] | string;
 }
