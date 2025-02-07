@@ -21,4 +21,11 @@ municipalityRouter.post(
   }
 );
 
+municipalityRouter.post(
+  "/api/v1/municipalities/add-neighbors/:munId",
+  async (req, res) => {
+    municipalityController.addNeighborings(req, res);
+  }
+);
+
 export default municipalityRouter;

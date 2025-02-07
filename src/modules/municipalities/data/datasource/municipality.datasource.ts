@@ -1,4 +1,5 @@
 import mysql from "mysql2/promise";
+import { ResultSetHeader } from 'mysql2';
 import Municipality from "../../domain/model/municipality";
 import dotenv from "dotenv";
 dotenv.config();
@@ -26,10 +27,6 @@ export default class MunicipalityDatasource {
   }
 
   async getMunicipalities(munIds: number[]): Promise<Municipality[]> {
-    if (munIds.length === 0) {
-      return [];
-    }
-
     const connection = await this.pool.getConnection();
     try {
       const [rows] = await connection.query(
@@ -40,6 +37,24 @@ export default class MunicipalityDatasource {
         [munIds]
       );
       return rows as Municipality[];
+    } finally {
+      connection.release();
+    }
+  }
+
+  async addNeighborings(munId: number, neighbors: number[]): Promise<Boolean> {
+    const connection = await this.pool.getConnection();
+    try {
+      const placeholders = neighbors.map(_ => "(?,?,?)").join(", ")
+      const values = neighbors.flatMap(n => [munId, n, 1])
+
+      const [result] = await connection.query<ResultSetHeader>(
+        `INSERT INTO MunicipioColindante (municipioID, colindanteID, puntoCardinalID) VALUES ${placeholders}`,
+        values
+      );
+      return result.affectedRows > 0;
+    } catch {
+      return false
     } finally {
       connection.release();
     }

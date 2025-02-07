@@ -38,5 +38,7 @@ export default class MunicipalityRepository {
     return result;
   }
 
-
+  async addNeighborings(munId: number, neighbors: number[]): Promise<Boolean> {
+    return this.municipalityDatasource.addNeighborings(munId, neighbors)
+  }
 }

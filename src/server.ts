@@ -5,7 +5,7 @@ import municipalityRouter from "./modules/municipalities/application/route/munic
 declare global {
   namespace Express {
     interface Request {
-      munId: string;
+      [param: string]: string;
     }
   }
 }
