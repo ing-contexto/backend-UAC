@@ -30,7 +30,7 @@ export default class MunicipalityDatasource {
     const connection = await this.pool.getConnection();
     try {
       const [rows] = await connection.query(
-        `SELECT m.ID as ID, m.nombre AS nombre, d.nombre AS distrito, r.nombre AS region, mc.nombre AS colindantes, pc.nombre AS cardenal 
+        `SELECT m.ID as clave, m.nombre AS nombre, d.nombre AS distrito, r.nombre AS region, mc.nombre AS colindantes, pc.nombre AS cardenal 
         FROM Municipio m INNER JOIN Distrito d ON m.distritoID = d.ID INNER JOIN Region r ON d.regionID = r.ID LEFT JOIN MunicipioColindante col 
         ON m.ID = col.municipioID LEFT JOIN Municipio mc ON col.colindanteID = mc.ID LEFT JOIN 
         PuntosCardinales pc ON col.puntoCardinalID = pc.ID WHERE m.ID IN (?)`,

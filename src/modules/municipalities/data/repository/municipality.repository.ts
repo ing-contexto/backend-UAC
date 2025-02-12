@@ -19,7 +19,7 @@ export default class MunicipalityRepository {
     mun.forEach(m => {
       if (!municipiosMap.has(m.nombre)) {
         municipiosMap.set(m.nombre, {
-          id: m.id,
+          clave: m.clave,
           nombre: m.nombre,
           distrito: m.distrito,
           region: m.region,
