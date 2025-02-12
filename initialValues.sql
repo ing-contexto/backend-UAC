@@ -613,3 +613,26 @@ INSERT INTO Municipio (nombre, distritoID) VALUES
     ('Zimatlán de Álvarez', (SELECT ID FROM Distrito WHERE nombre = 'ZIMATLÁN'))
 ;
 
+--Inserts en tablas nuevas
+INSERT INTO SectorActividadEconomica (nombre) VALUES ('Primario');
+INSERT INTO SectorActividadEconomica (nombre) VALUES ('Secundario');
+INSERT INTO SectorActividadEconomica (nombre) VALUES ('Terciario');
+
+INSERT INTO GrupoCriminal (nombre) VALUES ('Cártel Beltrán Leyva');
+INSERT INTO GrupoCriminal (nombre) VALUES ('Cártel de Los Zetas');
+INSERT INTO GrupoCriminal (nombre) VALUES ('Cártel de Los Zetas Incisión Z-35');
+INSERT INTO GrupoCriminal (nombre) VALUES ('Cártel de Sinaloa');
+INSERT INTO GrupoCriminal (nombre) VALUES ('Cártel Jalisco Nueva Generación');
+INSERT INTO GrupoCriminal (nombre) VALUES ('Catapilas');
+INSERT INTO GrupoCriminal (nombre) VALUES ('Díaz Pantoja');
+INSERT INTO GrupoCriminal (nombre) VALUES ('El Cheturo');
+INSERT INTO GrupoCriminal (nombre) VALUES ('Hermanos Ríos Suárez');
+INSERT INTO GrupoCriminal (nombre) VALUES ('Los Alacranes');
+INSERT INTO GrupoCriminal (nombre) VALUES ('Los Chehuis');
+INSERT INTO GrupoCriminal (nombre) VALUES ('Los Chukis');
+INSERT INTO GrupoCriminal (nombre) VALUES ('Los Coyunda');
+INSERT INTO GrupoCriminal (nombre) VALUES ('Los Pilos');
+INSERT INTO GrupoCriminal (nombre) VALUES ('Los Putlecos');
+INSERT INTO GrupoCriminal (nombre) VALUES ('Los Reyes');
+INSERT INTO GrupoCriminal (nombre) VALUES ('Los Terán');
+INSERT INTO GrupoCriminal (nombre) VALUES ('Los Yglesias');
