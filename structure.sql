@@ -69,3 +69,46 @@ BEGIN
         SET MESSAGE_TEXT = 'Un municipio no puede ser colindante consigo mismo.';
     END IF;
 END
+
+--Nuevas tablas
+CREATE TABLE GrupoCriminal (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE Municipio_GrupoCriminal (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    municipioID INT NOT NULL,
+    grupoCriminalID INT NOT NULL,
+    FOREIGN KEY (municipioID) REFERENCES Municipio(ID) ON DELETE CASCADE,
+    FOREIGN KEY (grupoCriminalID) REFERENCES GrupoCriminal(ID) ON DELETE CASCADE,
+    CONSTRAINT unico_grupo_criminal UNIQUE (municipioID, grupoCriminalID)
+) ENGINE=InnoDB;
+
+CREATE TABLE Localidad (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255) NOT NULL,
+    municipioID INT NOT NULL,
+    FOREIGN KEY (municipioID) REFERENCES Municipio(ID) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE SectorActividadEconomica (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE ActividadEconomica (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255) NOT NULL,
+    sectorActividadEconomicaID INT NOT NULL,
+    FOREIGN KEY (sectorActividadEconomicaID) REFERENCES SectorActividadEconomica(ID) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE Actividad_Economica_Municipio (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    municipioID INT NOT NULL,
+    actividadEconomicaID INT NOT NULL,
+    FOREIGN KEY (municipioID) REFERENCES Municipio(ID) ON DELETE CASCADE,
+    FOREIGN KEY (actividadEconomicaID) REFERENCES ActividadEconomica(ID) ON DELETE CASCADE,
+    CONSTRAINT unico_actividad_economica UNIQUE (municipioID, actividadEconomicaID)
+) ENGINE=InnoDB;
