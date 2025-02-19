@@ -1,11 +1,4 @@
-
--- DROP TABLE IF EXISTS Municipio_DatosEspecificos;
 -- DROP TABLE IF EXISTS MunicipioColindante;
-
--- DROP TABLE IF EXISTS DatosEspecificos;
-
-DROP TABLE IF EXISTS PuntosCardinales;
-
 DROP TABLE IF EXISTS Municipio_GrupoCriminal;
 DROP TABLE IF EXISTS GrupoCriminal;
 DROP TABLE IF EXISTS Localidad;

@@ -30,10 +30,30 @@ export default class MunicipalityDatasource {
     const connection = await this.pool.getConnection();
     try {
       const [rows] = await connection.query(
-        `SELECT m.ID as clave, m.nombre AS nombre, d.nombre AS distrito, r.nombre AS region, mc.nombre AS colindantes, pc.nombre AS cardenal 
-        FROM Municipio m INNER JOIN Distrito d ON m.distritoID = d.ID INNER JOIN Region r ON d.regionID = r.ID LEFT JOIN MunicipioColindante col 
-        ON m.ID = col.municipioID LEFT JOIN Municipio mc ON col.colindanteID = mc.ID LEFT JOIN 
-        PuntosCardinales pc ON col.puntoCardinalID = pc.ID WHERE m.ID IN (?)`,
+        `SELECT m.ID AS clave,
+          m.nombre AS nombre,
+          d.nombre AS distrito,
+          r.nombre AS region,
+          GROUP_CONCAT(
+              DISTINCT mc.nombre
+              ORDER BY mc.nombre SEPARATOR '; '
+          ) AS colindantes,
+          GROUP_CONCAT(
+              DISTINCT hr.titulo
+              ORDER BY hr.fecha DESC SEPARATOR ' ||| '
+          ) AS hechos
+      FROM Municipio m
+          INNER JOIN Distrito d ON m.distritoID = d.ID
+          INNER JOIN Region r ON d.regionID = r.ID
+          LEFT JOIN MunicipioColindante col ON m.ID = col.municipioID
+          LEFT JOIN Municipio mc ON col.colindanteID = mc.ID
+          LEFT JOIN Municipio_HechosRecientes mhr ON m.ID = mhr.municipioID
+          LEFT JOIN HechosRecientes hr ON mhr.hechosRecientesID = hr.ID
+      WHERE m.ID IN (?)
+      GROUP BY m.ID,
+          m.nombre,
+          d.nombre,
+          r.nombre`,
         [munIds]
       );
       return rows as Municipality[];
@@ -59,4 +79,48 @@ export default class MunicipalityDatasource {
       connection.release();
     }
   }
+  async addRecentEvent(
+    hecho: HechoReciente,
+    munIds: number[]
+  ): Promise<boolean> {
+    const connection = await this.pool.getConnection();
+    try {
+      await connection.beginTransaction();
+
+      // Insertar el hecho reciente
+      const [result] = await connection.query<ResultSetHeader>(
+        "INSERT INTO HechosRecientes (titulo, fecha, descripcion) VALUES (?, ?, ?)",
+        [hecho.titulo, hecho.fecha, hecho.descripcion]
+      );
+      console.log(result)
+
+      if (result.affectedRows === 0) {
+        await connection.rollback();
+        return false;
+      }
+
+      const hechosRecientesID = result.insertId;
+
+      // Asociar a municipios
+      if (munIds.length > 0) {
+        const placeholders = munIds.map(() => "(?, ?)").join(", ");
+        const values = munIds.flatMap((id) => [id, hechosRecientesID]);
+
+        await connection.query(
+          `INSERT INTO Municipio_HechosRecientes (municipioID, hechosRecientesID) VALUES ${placeholders}`,
+          values
+        );
+      }
+
+      await connection.commit();
+      return true;
+    } catch (error) {
+      console.log(error);
+      await connection.rollback();
+      return false;
+    } finally {
+      connection.release();
+    }
+  }
+
 }

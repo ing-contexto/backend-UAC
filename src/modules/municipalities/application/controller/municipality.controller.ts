@@ -65,4 +65,20 @@ export default class MunicipalityController {
       res.status(500).json({ message: "Error al agregar el municipio" });
     }
   }
+
+  async addRecentEvent(req: Request, res: Response) {
+    try {
+      const munIds: number[] = req.body.munIds;
+      const hecho: HechoReciente = req.body.hecho
+      const mun = await this.municipalityRepository.addRecentEvent(hecho, munIds);
+      if (mun) {
+        res.status(200).json({ message: "Municipios colindantes actualizados" });
+        return;
+      }
+      res.status(404).json({ message: "Error al agregar el municipio" });
+    } catch (error) {
+      console.error("Error al obtener municipio por ID:", error);
+      res.status(500).json({ message: "Error al agregar el municipio" });
+    }
+  }
 }
