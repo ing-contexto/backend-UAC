@@ -68,9 +68,9 @@ export default class MunicipalityController {
 
   async addRecentEvent(req: Request, res: Response) {
     try {
-      const munIds: number[] = req.body.munIds;
-      const hecho: HechoReciente = req.body.hecho
-      const mun = await this.municipalityRepository.addRecentEvent(hecho, munIds);
+      const munId: number[] = req.body.munId;
+      const event: RecentEvent = req.body.event
+      const mun = await this.municipalityRepository.addRecentEvent(event, munId);
       if (mun) {
         res.status(200).json({ message: "Municipios colindantes actualizados" });
         return;
@@ -79,6 +79,28 @@ export default class MunicipalityController {
     } catch (error) {
       console.error("Error al obtener municipio por ID:", error);
       res.status(500).json({ message: "Error al agregar el municipio" });
+    }
+  }
+
+  async getRecentEvents(req: Request, res: Response) {
+    try {
+      const munId: number[] = req.body.munId;
+
+      if (!Array.isArray(munId) || !munId.every(id => id >= 0)) {
+        res.status(400).json({ message: "Lista de eventos inválida" });
+        return;
+      }
+
+      const mun = await this.municipalityRepository.getRecentEvents(munId);
+      if (mun != null) {
+        res.status(200).json(mun);
+        return;
+      }
+
+      res.status(404).json({ message: "Eventos no encontrados" });
+    } catch (error) {
+      console.error("Error al obtener eventos:", error);
+      res.status(500).json({ message: "Error interno del servidor" });
     }
   }
 }

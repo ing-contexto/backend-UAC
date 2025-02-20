@@ -37,4 +37,5 @@ GROUP BY hr.ID,
     hr.titulo,
     hr.fecha,
     hr.descripcion
+HAVING SUM(m.ID IN (1, 3)) > 0
 ORDER BY hr.fecha DESC;

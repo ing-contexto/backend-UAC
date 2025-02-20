@@ -1,4 +1,4 @@
-interface HechoReciente {
+interface RecentEvent {
     id: number;
     titulo: string;
     fecha: Date;

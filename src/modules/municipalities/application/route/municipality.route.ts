@@ -32,4 +32,8 @@ municipalityRouter.post("/api/v1/municipalities/add-event", async (req, res) => 
   municipalityController.addRecentEvent(req, res);
 })
 
+municipalityRouter.post("/api/v1/municipalities/get-events", async (req, res) => {
+  municipalityController.getRecentEvents(req, res);
+})
+
 export default municipalityRouter;

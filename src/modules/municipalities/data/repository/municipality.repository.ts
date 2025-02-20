@@ -12,15 +12,19 @@ export default class MunicipalityRepository {
     return this.municipalityDatasource.getMunicipality(munId);
   }
 
-  async getMunicipalities(munIds: number[]): Promise<Municipality[]> {
-    return this.municipalityDatasource.getMunicipalities(munIds);
+  async getMunicipalities(munId: number[]): Promise<Municipality[]> {
+    return this.municipalityDatasource.getMunicipalities(munId);
   }
 
   async addNeighborings(munId: number, neighbors: number[]): Promise<Boolean> {
     return this.municipalityDatasource.addNeighborings(munId, neighbors)
   }
 
-  async addRecentEvent(hecho: HechoReciente, munIds: number[]): Promise<Boolean> {
-    return this.municipalityDatasource.addRecentEvent(hecho, munIds)
+  async addRecentEvent(event: RecentEvent, munId: number[]): Promise<Boolean> {
+    return this.municipalityDatasource.addRecentEvent(event, munId)
+  }
+
+  async getRecentEvents(munId: number[]): Promise<RecentEvent[]> {
+    return this.municipalityDatasource.getRecentEvents(munId)
   }
 }
