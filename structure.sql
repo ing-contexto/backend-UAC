@@ -17,19 +17,19 @@ CREATE TABLE Municipio (
     FOREIGN KEY (distritoID) REFERENCES Distrito(ID) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
-CREATE TABLE DatosEspecificos (
+CREATE TABLE HechosRecientes (
     ID INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(255) NOT NULL,
-    titulo VARCHAR(255),
-    cuerpo TEXT
+    titulo VARCHAR(255) NOT NULL,
+    fecha DATE NOT NULL,
+    descripcion TEXT NOT NULL
 ) ENGINE=InnoDB;
 
-CREATE TABLE Municipio_DatosEspecificos (
+CREATE TABLE Municipio_HechosRecientes (
     ID INT PRIMARY KEY AUTO_INCREMENT,
     municipioID INT NOT NULL,
-    datosEspecificosID INT NOT NULL,
+    hechosRecientesID INT NOT NULL,
     FOREIGN KEY (municipioID) REFERENCES Municipio(ID) ON DELETE CASCADE,
-    FOREIGN KEY (datosEspecificosID) REFERENCES DatosEspecificos(ID) ON DELETE CASCADE
+    FOREIGN KEY (hechosRecientesID) REFERENCES HechosRecientes(ID) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE PuntosCardinales (
