@@ -119,10 +119,21 @@ export default class MunicipalityDatasource {
     const connection = await this.pool.getConnection();
     try {
       const [rows] = await connection.query(
-        `SELECT hr.ID AS id_hecho, hr.titulo AS titulo, hr.fecha AS fecha, hr.descripcion AS descripcion,
-        GROUP_CONCAT( DISTINCT m.nombre ORDER BY m.nombre SEPARATOR '; ' ) AS municipios FROM HechosRecientes hr 
-        LEFT JOIN Municipio_HechosRecientes mhr ON hr.ID = mhr.hechosRecientesID LEFT JOIN Municipio m ON mhr.municipioID = m.ID 
-        GROUP BY hr.ID, hr.titulo, hr.fecha, hr.descripcion HAVING SUM(m.ID IN (?)) > 0 ORDER BY hr.fecha DESC;`,
+        `SELECT hr.ID AS id_hecho,
+            hr.titulo AS titulo,
+            hr.fecha AS fecha,
+            hr.descripcion AS descripcion,
+            JSON_ARRAYAGG(m.ID) AS municipios
+        FROM HechosRecientes hr
+            LEFT JOIN Municipio_HechosRecientes mhr ON hr.ID = mhr.hechosRecientesID
+            LEFT JOIN Municipio m ON mhr.municipioID = m.ID
+        WHERE m.ID IS NOT NULL
+        GROUP BY hr.ID,
+            hr.titulo,
+            hr.fecha,
+            hr.descripcion
+        HAVING SUM(m.ID IN (?)) > 0
+        ORDER BY hr.fecha DESC`,
         [munId]
       );
       return rows as RecentEvent[];
@@ -130,5 +141,21 @@ export default class MunicipalityDatasource {
       connection.release();
     }
 
+  }
+
+  async deleteRecentEvent(eventId: number): Promise<boolean> {
+    const connection = await this.pool.getConnection();
+    try {
+      const [result] = await connection.query<ResultSetHeader>(
+        "DELETE FROM HechosRecientes WHERE ID = ?",
+        [eventId]
+      );
+      return result.affectedRows > 0;
+    } catch (error) {
+      console.error("Error al eliminar el evento", error);
+      return false;
+    } finally {
+      connection.release();
+    }
   }
 }

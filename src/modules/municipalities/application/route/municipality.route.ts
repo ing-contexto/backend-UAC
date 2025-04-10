@@ -36,4 +36,8 @@ municipalityRouter.post("/api/v1/municipalities/get-events", async (req, res) =>
   municipalityController.getRecentEvents(req, res);
 })
 
+municipalityRouter.delete("/api/v1/municipalities/delete-event/:eventId", async (req, res) => {
+  municipalityController.deleteRecentEvent(req, res);
+})
+
 export default municipalityRouter;

@@ -27,4 +27,8 @@ export default class MunicipalityRepository {
   async getRecentEvents(munId: number[]): Promise<RecentEvent[]> {
     return this.municipalityDatasource.getRecentEvents(munId)
   }
+
+  async deleteRecentEvent(eventId: number): Promise<Boolean> {
+    return this.municipalityDatasource.deleteRecentEvent(eventId)
+  }
 }
