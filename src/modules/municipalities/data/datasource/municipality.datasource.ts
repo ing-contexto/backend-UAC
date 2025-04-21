@@ -158,4 +158,20 @@ export default class MunicipalityDatasource {
       connection.release();
     }
   }
+
+  async updateRecentEvent(eventId: number, event: RecentEvent): Promise<boolean> {
+    const connection = await this.pool.getConnection();
+    try {
+      const [result] = await connection.query<ResultSetHeader>(
+        "UPDATE HechosRecientes SET titulo = ?, fecha = ?, descripcion = ? WHERE ID = ?",
+        [event.titulo, event.fecha, event.descripcion, eventId]
+      );
+      return result.affectedRows > 0;
+    } catch (error) {
+      console.error("Error al actualizar el evento", error);
+      return false;
+    } finally {
+      connection.release();
+    }
+  }
 }

@@ -118,4 +118,20 @@ export default class MunicipalityController {
       res.status(500).json({ message: "Error interno del servidor" });
     }
   }
+
+  async updateRecentEvent(req: Request, res: Response) {
+    try {
+      const eventId = Number(req.params.eventId);
+      const event: RecentEvent = req.body.event
+      const mun = await this.municipalityRepository.updateRecentEvent(eventId, event);
+      if (mun) {
+        res.status(200).json({ message: "Evento actualizado" });
+        return;
+      }
+      res.status(404).json({ message: "Error al actualizar el evento" });
+    } catch (error) {
+      console.error("Error al actualizar evento:", error);
+      res.status(500).json({ message: "Error interno del servidor" });
+    }
+  }
 }

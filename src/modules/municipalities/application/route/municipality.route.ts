@@ -40,4 +40,8 @@ municipalityRouter.delete("/api/v1/municipalities/delete-event/:eventId", async 
   municipalityController.deleteRecentEvent(req, res);
 })
 
+municipalityRouter.put("/api/v1/municipalities/update-event/:eventId", async (req, res) => {
+  municipalityController.updateRecentEvent(req, res);
+})
+
 export default municipalityRouter;
