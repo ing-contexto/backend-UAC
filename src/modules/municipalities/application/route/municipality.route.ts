@@ -2,13 +2,18 @@ import { Router } from "express";
 import MunicipalityDatasource from "../../data/datasource/municipality.datasource";
 import MunicipalityRepository from "../../data/repository/municipality.repository";
 import MunicipalityController from "../controller/municipality.controller";
+import ConevalDatasource from "../../data/datasource/coneval.datasource";
+import ConevalRepository from "../../data/repository/coneval.repository";
 
 const municipalityRouter: Router = Router();
 
 const datasource = new MunicipalityDatasource();
 const repository = new MunicipalityRepository(datasource);
 
-const municipalityController = new MunicipalityController(repository);
+const conevalDatasource = new ConevalDatasource();
+const conevalRepository = new ConevalRepository(conevalDatasource);
+
+const municipalityController = new MunicipalityController(repository, conevalRepository);
 
 municipalityRouter.post("/api/v1/municipalities/get-mun", async (req, res) => {
   municipalityController.getMunicipality(req, res);
@@ -42,6 +47,10 @@ municipalityRouter.delete("/api/v1/municipalities/delete-event/:eventId", async 
 
 municipalityRouter.put("/api/v1/municipalities/update-event/:eventId", async (req, res) => {
   municipalityController.updateRecentEvent(req, res);
+})
+
+municipalityRouter.post("/api/v1/coneval/get-data", async (req, res) => {
+  municipalityController.GetConevalData(req, res);
 })
 
 export default municipalityRouter;

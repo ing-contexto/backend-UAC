@@ -1,11 +1,14 @@
+import ConevalRepository from "../../data/repository/coneval.repository";
 import MunicipalityRepository from "../../data/repository/municipality.repository";
 import { Request, Response } from "express";
 
 export default class MunicipalityController {
   private municipalityRepository: MunicipalityRepository;
+  private conevalRepository: ConevalRepository;
 
-  constructor(reposiroty: MunicipalityRepository) {
+  constructor(reposiroty: MunicipalityRepository, conevalRepository: ConevalRepository) {
     this.municipalityRepository = reposiroty;
+    this.conevalRepository = conevalRepository;
   }
 
   async getMunicipality(req: Request, res: Response) {
@@ -59,10 +62,10 @@ export default class MunicipalityController {
         res.status(200).json({ message: "Municipios colindantes actualizados" });
         return;
       }
-      res.status(404).json({ message: "Error al agregar el municipio" });
+      res.status(404).json({ message: "Error al agregar los municipios colindantes" });
     } catch (error) {
       console.error("Error al obtener municipio por ID:", error);
-      res.status(500).json({ message: "Error al agregar el municipio" });
+      res.status(500).json({ message: "Error al agregar los municipios colindantes" });
     }
   }
 
@@ -75,10 +78,10 @@ export default class MunicipalityController {
         res.status(200).json({ message: "Evento reciente creado" });
         return;
       }
-      res.status(404).json({ message: "Error al agregar el municipio" });
+      res.status(404).json({ message: "Error al agregar el hecho reciente" });
     } catch (error) {
       console.error("Error al obtener municipio por ID:", error);
-      res.status(500).json({ message: "Error al agregar el municipio" });
+      res.status(500).json({ message: "Error al agregar el hecho reciente" });
     }
   }
 
@@ -131,6 +134,28 @@ export default class MunicipalityController {
       res.status(404).json({ message: "Error al actualizar el evento" });
     } catch (error) {
       console.error("Error al actualizar evento:", error);
+      res.status(500).json({ message: "Error interno del servidor" });
+    }
+  }
+
+  async GetConevalData(req: Request, res: Response) {
+    try {
+      const munIds: number[] = req.body.munIds;
+
+      if (!Array.isArray(munIds) || !munIds.every(id => id >= 0)) {
+        res.status(400).json({ message: "Lista de municipios inválida" });
+        return;
+      }
+
+      const mun = await this.conevalRepository.getConevalData(munIds);
+      if (mun != null) {
+        res.status(200).json(mun);
+        return;
+      }
+
+      res.status(404).json({ message: "Error al obtener los datos no encontrados" });
+    } catch (error) {
+      console.error("Error al obtener datos de Coneval:", error);
       res.status(500).json({ message: "Error interno del servidor" });
     }
   }
