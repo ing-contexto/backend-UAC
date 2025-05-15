@@ -88,7 +88,7 @@ export default class MunicipalityDatasource {
     try {
       await connection.beginTransaction();
       const [result] = await connection.query<ResultSetHeader>(
-        "INSERT INTO HechosRecientes (titulo, fecha, descripcion) VALUES (?, ?, ?)",
+        "INSERT INTO HechosRecientes (titulo, fecha, descripcion, link) VALUES (?, ?, ?, ?)",
         [event.titulo, event.fecha, event.descripcion]
       );
       if (result.affectedRows === 0) {
@@ -123,6 +123,7 @@ export default class MunicipalityDatasource {
             hr.titulo AS titulo,
             hr.fecha AS fecha,
             hr.descripcion AS descripcion,
+            hr.link AS link,
             JSON_ARRAYAGG(m.ID) AS municipios
         FROM HechosRecientes hr
             LEFT JOIN Municipio_HechosRecientes mhr ON hr.ID = mhr.hechosRecientesID
@@ -132,6 +133,7 @@ export default class MunicipalityDatasource {
             hr.titulo,
             hr.fecha,
             hr.descripcion
+            hr.link
         HAVING SUM(m.ID IN (?)) > 0
         ORDER BY hr.fecha DESC`,
         [munId]
@@ -163,7 +165,7 @@ export default class MunicipalityDatasource {
     const connection = await this.pool.getConnection();
     try {
       const [result] = await connection.query<ResultSetHeader>(
-        "UPDATE HechosRecientes SET titulo = ?, fecha = ?, descripcion = ? WHERE ID = ?",
+        "UPDATE HechosRecientes SET titulo = ?, fecha = ?, descripcion = ?, link = ? WHERE ID = ?",
         [event.titulo, event.fecha, event.descripcion, eventId]
       );
       return result.affectedRows > 0;

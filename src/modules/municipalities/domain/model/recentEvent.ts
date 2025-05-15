@@ -3,4 +3,5 @@ interface RecentEvent {
     titulo: string;
     fecha: Date;
     descripcion: string;
+    link: string;
 }
