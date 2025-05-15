@@ -89,7 +89,7 @@ export default class MunicipalityDatasource {
       await connection.beginTransaction();
       const [result] = await connection.query<ResultSetHeader>(
         "INSERT INTO HechosRecientes (titulo, fecha, descripcion, link) VALUES (?, ?, ?, ?)",
-        [event.titulo, event.fecha, event.descripcion]
+        [event.titulo, event.fecha, event.descripcion, event.link]
       );
       if (result.affectedRows === 0) {
         await connection.rollback();
