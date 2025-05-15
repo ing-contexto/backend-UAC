@@ -132,7 +132,7 @@ export default class MunicipalityDatasource {
         GROUP BY hr.ID,
             hr.titulo,
             hr.fecha,
-            hr.descripcion
+            hr.descripcion,
             hr.link
         HAVING SUM(m.ID IN (?)) > 0
         ORDER BY hr.fecha DESC`,
