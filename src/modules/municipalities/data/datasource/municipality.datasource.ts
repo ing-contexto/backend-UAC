@@ -31,29 +31,32 @@ export default class MunicipalityDatasource {
     try {
       const [rows] = await connection.query(
         `SELECT m.ID AS clave,
-          m.nombre AS nombre,
-          d.nombre AS distrito,
-          r.nombre AS region,
-          GROUP_CONCAT(
-              DISTINCT mc.nombre
-              ORDER BY mc.nombre SEPARATOR '; '
-          ) AS colindantes,
-          GROUP_CONCAT(
-              DISTINCT hr.titulo
-              ORDER BY hr.fecha DESC SEPARATOR ' ||| '
-          ) AS hechos
-      FROM Municipio m
-          INNER JOIN Distrito d ON m.distritoID = d.ID
-          INNER JOIN Region r ON d.regionID = r.ID
-          LEFT JOIN MunicipioColindante col ON m.ID = col.municipioID
-          LEFT JOIN Municipio mc ON col.colindanteID = mc.ID
-          LEFT JOIN Municipio_HechosRecientes mhr ON m.ID = mhr.municipioID
-          LEFT JOIN HechosRecientes hr ON mhr.hechosRecientesID = hr.ID
-      WHERE m.ID IN (?)
-      GROUP BY m.ID,
-          m.nombre,
-          d.nombre,
-          r.nombre`,
+              m.nombre AS nombre,
+              d.nombre AS distrito,
+              r.nombre AS region,
+              m.archivoSistema AS archivoSistema,
+              GROUP_CONCAT(
+                  DISTINCT mc.nombre
+                  ORDER BY mc.nombre SEPARATOR '; '
+              ) AS colindantes,
+              GROUP_CONCAT(
+                  DISTINCT hr.titulo
+                  ORDER BY hr.fecha DESC SEPARATOR ' ||| '
+              ) AS hechos
+        FROM Municipio m
+            INNER JOIN Distrito d ON m.distritoID = d.ID
+            INNER JOIN Region r ON d.regionID = r.ID
+            LEFT JOIN MunicipioColindante col ON m.ID = col.municipioID
+            LEFT JOIN Municipio mc ON col.colindanteID = mc.ID
+            LEFT JOIN Municipio_HechosRecientes mhr ON m.ID = mhr.municipioID
+            LEFT JOIN HechosRecientes hr ON mhr.hechosRecientesID = hr.ID
+        WHERE m.ID IN (?)
+        GROUP BY m.ID,
+                m.nombre,
+                d.nombre,
+                r.nombre,
+                m.archivoSistema;
+        `,
         [munId]
       );
       return rows as Municipality[];

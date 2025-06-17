@@ -21,7 +21,8 @@ CREATE TABLE HechosRecientes (
     ID INT PRIMARY KEY AUTO_INCREMENT,
     titulo VARCHAR(255) NOT NULL,
     fecha DATE NOT NULL,
-    descripcion TEXT NOT NULL
+    descripcion TEXT NOT NULL,
+    link VARCHAR(500) DEFAULT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE Municipio_HechosRecientes (
