@@ -37,6 +37,7 @@ userRouter.post(
     "/api/v1/create-user",
 
     (req, res) => {
+        console.log("si")
         userController.createUser(req, res);
     }
 );
