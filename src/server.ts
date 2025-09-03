@@ -24,8 +24,8 @@ server.use(
 );
 server.use(express.json());
 
-// server.use(authRouter);
+server.use(authRouter);
 server.use(municipalityRouter);
-// server.use(userRouter);
+server.use(userRouter);
 
 export default server;

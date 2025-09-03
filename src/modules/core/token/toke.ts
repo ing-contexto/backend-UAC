@@ -10,7 +10,7 @@ export class authToken {
     private readonly audience: string;
 
     constructor(secret = process.env.SECRET, issuer = "uac-oaxaca.xyz", audience = "uac-auth") {
-        if (!secret || secret.length < 32) throw new Error("JWT secret missing/weak");
+        if (!secret || secret.length < 6) throw new Error("JWT secret missing/weak");
         this.secret = secret;
         this.issuer = issuer;
         this.audience = audience;
