@@ -41,7 +41,7 @@ export default class UserDatasource {
             const hashed = bcrypt.hashSync(newUser.password, 10);
             console.log("3")
             const sqlAuto =
-                "INSERT INTO Usuario ('Nombre', 'Usuario', 'Correo', 'Password', 'Rol_id') VALUES (?, ?, ?, ?, ?)";
+                "INSERT INTO `Usuario` (`Nombre`, `Usuario`, `Correo`, `Password`, `Rol_id`) VALUES (?, ?, ?, ?, ?)";
 
             const paramsAuto = [newUser.nombre, newUser.usuario, newUser.correo, hashed, newUser.rol];
 
@@ -51,13 +51,14 @@ export default class UserDatasource {
             const id = (result as ResultSetHeader).insertId;
             console.log("5")
             return await this.getCurrentUser(id);
-        } catch {
+        } catch (err) {
+            console.error("createUser error:", err);
             return null;
-        } finally {
+        }
+        finally {
             conn.release();
         }
     }
-
 
     async updateUser(userId: number, updated: user): Promise<user | null> {
         const conn = await this.pool.getConnection();
