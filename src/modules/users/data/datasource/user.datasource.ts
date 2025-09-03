@@ -34,17 +34,22 @@ export default class UserDatasource {
     }
 
     async createUser(newUser: user): Promise<user | null> {
+        console.log("1")
         const conn = await this.pool.getConnection();
+        console.log("2")
         try {
             const hashed = bcrypt.hashSync(newUser.password, 10);
+            console.log("3")
             const sqlAuto =
                 "INSERT INTO Usuario ('Nombre', 'Usuario', 'Correo', 'Password', 'Rol_id') VALUES (?, ?, ?, ?, ?)";
 
             const paramsAuto = [newUser.nombre, newUser.usuario, newUser.correo, hashed, newUser.rol];
 
             const [result] = await conn.execute<ResultSetHeader>(sqlAuto, paramsAuto);
+            console.log("4")
 
             const id = (result as ResultSetHeader).insertId;
+            console.log("5")
             return await this.getCurrentUser(id);
         } catch {
             return null;
