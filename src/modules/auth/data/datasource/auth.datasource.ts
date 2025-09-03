@@ -13,7 +13,7 @@ export default class AuthDatasource {
     const conn = await this.pool.getConnection();
     try {
       const [rows] = await conn.execute<(user & RowDataPacket)[]>(
-        "SELECT * FROM Usuario WHERE Correo = ?",
+        "SELECT * FROM Usuario WHERE Usuario = ?",
         [credentials.email]
       );
       if (rows.length === 0) return null;
