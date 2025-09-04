@@ -1,13 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { authToken } from "../../../core/token/toke";
 
-// declare global {
-//   namespace Express {
-//     interface Request {
-//       userId: string;
-//     }
-//   }
-// }
 
 export class AuthMiddlewareController {
   private token: authToken;
