@@ -171,7 +171,7 @@ export default class MunicipalityDatasource {
     try {
       const [result] = await connection.query<ResultSetHeader>(
         "UPDATE HechosRecientes SET titulo = ?, fecha = ?, descripcion = ?, link = ? WHERE ID = ?",
-        [event.titulo, event.fecha, event.descripcion, eventId]
+        [event.titulo, event.fecha, event.descripcion, event.link, eventId]
       );
       return result.affectedRows > 0;
     } catch (error) {
