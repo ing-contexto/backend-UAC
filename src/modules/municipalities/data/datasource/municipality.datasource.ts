@@ -1,5 +1,5 @@
 import mysql from "mysql2/promise";
-import { ResultSetHeader } from 'mysql2';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import Municipality from "../../domain/model/municipality";
 import dotenv from "dotenv";
 dotenv.config();
@@ -166,16 +166,46 @@ export default class MunicipalityDatasource {
     }
   }
 
-  async updateRecentEvent(eventId: number, event: RecentEvent): Promise<boolean> {
+  async updateRecentEvent(
+    eventId: number,
+    event: RecentEvent,
+    munIds?: number[]
+  ): Promise<boolean> {
     const connection = await this.pool.getConnection();
     try {
-      const [result] = await connection.query<ResultSetHeader>(
-        "UPDATE HechosRecientes SET titulo = ?, fecha = ?, descripcion = ?, link = ? WHERE ID = ?",
+      await connection.beginTransaction();
+
+      const [u] = await connection.execute<ResultSetHeader>(
+        "UPDATE HechosRecientes SET titulo = ?, fecha = ?, descripcion = ?, link = ? WHERE id = ? LIMIT 1",
         [event.titulo, event.fecha, event.descripcion, event.link, eventId]
       );
-      return result.affectedRows > 0;
-    } catch (error) {
-      console.error("Error al actualizar el evento", error);
+
+      if (Array.isArray(munIds)) {
+        const ids = Array.from(new Set(munIds)).filter((n) => Number.isFinite(n));
+        await connection.execute(
+          "DELETE FROM Municipio_HechosRecientes WHERE hechosRecientesID = ?",
+          [eventId]
+        );
+        if (ids.length > 0) {
+          const placeholders = ids.map(() => "(?, ?)").join(", ");
+          const values = ids.flatMap((id) => [id, eventId]);
+          await connection.execute(
+            `INSERT INTO Municipio_HechosRecientes (municipioID, hechosRecientesID) VALUES ${placeholders}`,
+            values
+          );
+        }
+      }
+
+      await connection.commit();
+
+      if (u.affectedRows > 0) return true;
+      const [rows] = await connection.execute<RowDataPacket[]>(
+        "SELECT id FROM HechosRecientes WHERE id = ? LIMIT 1",
+        [eventId]
+      );
+      return rows.length > 0;
+    } catch {
+      await connection.rollback();
       return false;
     } finally {
       connection.release();

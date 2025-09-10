@@ -126,7 +126,8 @@ export default class MunicipalityController {
     try {
       const eventId = Number(req.params.eventId);
       const event: RecentEvent = req.body.event
-      const mun = await this.municipalityRepository.updateRecentEvent(eventId, event);
+      const munIds: number[] = req.body.munIds;
+      const mun = await this.municipalityRepository.updateRecentEvent(eventId, event, munIds);
       if (mun) {
         res.status(200).json({ message: "Evento actualizado" });
         return;

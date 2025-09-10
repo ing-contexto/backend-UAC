@@ -32,7 +32,7 @@ export default class MunicipalityRepository {
     return this.municipalityDatasource.deleteRecentEvent(eventId)
   }
 
-  async updateRecentEvent(eventId: number, event: RecentEvent): Promise<Boolean> {
-    return this.municipalityDatasource.updateRecentEvent(eventId, event)
+  async updateRecentEvent(eventId: number, event: RecentEvent, munIds: number[]): Promise<Boolean> {
+    return this.municipalityDatasource.updateRecentEvent(eventId, event, munIds)
   }
 }
