@@ -3,5 +3,7 @@ interface RecentEvent {
     titulo: string;
     fecha: Date;
     descripcion: string;
+    conflictividad: { id: number; tipo?: string };
     link: string;
+    municipios?: number[];
 }

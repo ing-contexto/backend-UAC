@@ -93,8 +93,8 @@ export default class MunicipalityDatasource {
     try {
       await connection.beginTransaction();
       const [result] = await connection.query<ResultSetHeader>(
-        "INSERT INTO HechosRecientes (titulo, fecha, descripcion, link) VALUES (?, ?, ?, ?)",
-        [event.titulo, event.fecha, event.descripcion, event.link]
+        "INSERT INTO HechosRecientes (titulo, fecha, descripcion, link, conflictividadID) VALUES (?, ?, ?, ?, ?)",
+        [event.titulo, event.fecha, event.descripcion, event.link, event.conflictividad]
       );
       if (result.affectedRows === 0) {
         await connection.rollback();
@@ -123,32 +123,48 @@ export default class MunicipalityDatasource {
   async getRecentEvents(munId: number[]): Promise<RecentEvent[]> {
     const connection = await this.pool.getConnection();
     try {
-      const [rows] = await connection.query(
-        `SELECT hr.ID AS id_hecho,
-            hr.titulo AS titulo,
-            hr.fecha AS fecha,
-            hr.descripcion AS descripcion,
-            hr.link AS link,
-            JSON_ARRAYAGG(m.ID) AS municipios
-        FROM HechosRecientes hr
-            LEFT JOIN Municipio_HechosRecientes mhr ON hr.ID = mhr.hechosRecientesID
-            LEFT JOIN Municipio m ON mhr.municipioID = m.ID
-        WHERE m.ID IS NOT NULL
-        GROUP BY hr.ID,
-            hr.titulo,
-            hr.fecha,
-            hr.descripcion,
-            hr.link
-        HAVING SUM(m.ID IN (?)) > 0
-        ORDER BY hr.fecha DESC`,
+      const [rows] = await connection.query<any[]>(
+        `SELECT 
+          hr.ID AS id_hecho,
+          hr.titulo AS titulo,
+          hr.fecha AS fecha,
+          hr.descripcion AS descripcion,
+          hr.link AS link,
+          cs.ID AS conflictividad_id,
+          cs.tipo AS conflictividad_tipo,
+          JSON_ARRAYAGG(m.ID) AS municipios
+       FROM HechosRecientes hr
+       LEFT JOIN ConflictividadSocial cs ON cs.ID = hr.conflictividadID
+       LEFT JOIN (
+         SELECT DISTINCT hechosRecientesID, municipioID
+         FROM Municipio_HechosRecientes
+       ) mhr ON hr.ID = mhr.hechosRecientesID
+       LEFT JOIN Municipio m ON mhr.municipioID = m.ID
+       WHERE m.ID IS NOT NULL
+       GROUP BY 
+          hr.ID, hr.titulo, hr.fecha, hr.descripcion, hr.link,
+          cs.ID, cs.tipo
+       HAVING SUM(m.ID IN (?)) > 0
+       ORDER BY hr.fecha DESC`,
         [munId]
       );
-      return rows as RecentEvent[];
+
+      const result = rows.map(r => ({
+        id: r.id_hecho,
+        titulo: r.titulo,
+        fecha: r.fecha,
+        descripcion: r.descripcion,
+        link: r.link,
+        conflictividad: r.conflictividad_id != null ? { id: r.conflictividad_id, tipo: r.conflictividad_tipo } : null,
+        municipios: typeof r.municipios === 'string' ? JSON.parse(r.municipios) : r.municipios
+      }));
+
+      return result as RecentEvent[];
     } finally {
       connection.release();
     }
-
   }
+
 
   async deleteRecentEvent(eventId: number): Promise<boolean> {
     const connection = await this.pool.getConnection();
@@ -176,8 +192,8 @@ export default class MunicipalityDatasource {
       await connection.beginTransaction();
 
       const [u] = await connection.execute<ResultSetHeader>(
-        "UPDATE HechosRecientes SET titulo = ?, fecha = ?, descripcion = ?, link = ? WHERE id = ? LIMIT 1",
-        [event.titulo, event.fecha, event.descripcion, event.link, eventId]
+        "UPDATE HechosRecientes SET titulo = ?, fecha = ?, descripcion = ?, link = ?, conflictividadID = ? WHERE id = ? LIMIT 1",
+        [event.titulo, event.fecha, event.descripcion, event.link, event.conflictividad.id, eventId]
       );
 
       if (Array.isArray(munIds)) {
@@ -211,4 +227,5 @@ export default class MunicipalityDatasource {
       connection.release();
     }
   }
+
 }

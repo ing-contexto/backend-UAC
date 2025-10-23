@@ -10,6 +10,11 @@ CREATE TABLE Distrito (
     FOREIGN KEY (regionID) REFERENCES Region(ID) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+CREATE TABLE ConflictividadSocial (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    tipo ENUM('Agrario', 'Electoral', 'Religioso') NOT NULL
+) ENGINE=InnoDB;
+
 CREATE TABLE Municipio (
     ID INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(255) NOT NULL,
@@ -23,7 +28,8 @@ CREATE TABLE HechosRecientes (
     titulo VARCHAR(255) NOT NULL,
     fecha DATE NOT NULL,
     descripcion TEXT NOT NULL,
-    link VARCHAR(500) DEFAULT NULL
+    link VARCHAR(500) DEFAULT NULL,
+    conflictividad ENUM('Agrario', 'Electoral', 'Religioso') DEFAULT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE Municipio_HechosRecientes (
