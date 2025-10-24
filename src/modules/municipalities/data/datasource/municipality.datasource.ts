@@ -111,8 +111,7 @@ export default class MunicipalityDatasource {
       }
       await connection.commit();
       return true;
-    } catch (error) {
-      console.log(error);
+    } catch {
       await connection.rollback();
       return false;
     } finally {
@@ -193,7 +192,7 @@ export default class MunicipalityDatasource {
 
       const [u] = await connection.execute<ResultSetHeader>(
         "UPDATE HechosRecientes SET titulo = ?, fecha = ?, descripcion = ?, link = ?, conflictividadID = ? WHERE id = ? LIMIT 1",
-        [event.titulo, event.fecha, event.descripcion, event.link, event.conflictividad.id, eventId]
+        [event.titulo, event.fecha, event.descripcion, event.link, event.conflictividad, eventId]
       );
 
       if (Array.isArray(munIds)) {
