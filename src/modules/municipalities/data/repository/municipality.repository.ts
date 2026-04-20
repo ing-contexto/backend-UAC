@@ -20,7 +20,7 @@ export default class MunicipalityRepository {
     return this.municipalityDatasource.addNeighborings(munId, neighbors)
   }
 
-  async addRecentEvent(event: RecentEvent, munId: number[]): Promise<Boolean> {
+  async addRecentEvent(event: RecentEvent, munId: number[]): Promise<RecentEvent> {
     return this.municipalityDatasource.addRecentEvent(event, munId)
   }
 

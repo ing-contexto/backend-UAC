@@ -71,17 +71,15 @@ export default class MunicipalityController {
 
   async addRecentEvent(req: Request, res: Response) {
     try {
-      const munId: number[] = req.body.munId;
+      const munId: number[] = req.body.munId
       const event: RecentEvent = req.body.event
-      const mun = await this.municipalityRepository.addRecentEvent(event, munId);
-      if (mun) {
-        res.status(200).json({ message: "Evento reciente creado" });
-        return;
-      }
-      res.status(404).json({ message: "Error al agregar el hecho reciente" });
+
+      const createdEvent = await this.municipalityRepository.addRecentEvent(event, munId)
+
+      res.status(201).json(createdEvent)
     } catch (error) {
-      console.error("Error al obtener municipio por ID:", error);
-      res.status(500).json({ message: "Error al agregar el hecho reciente" });
+      console.error("Error al agregar el hecho reciente:", error)
+      res.status(500).json({ message: "Error al agregar el hecho reciente" })
     }
   }
 

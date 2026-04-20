@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export default class MunicipalityDatasource {
+
   private pool: mysql.Pool;
 
   constructor() {
@@ -85,35 +86,48 @@ export default class MunicipalityDatasource {
     }
   }
 
+
+
   async addRecentEvent(
     event: RecentEvent,
     munId: number[]
-  ): Promise<boolean> {
+  ): Promise<RecentEvent> {
     const connection = await this.pool.getConnection();
+
     try {
       await connection.beginTransaction();
+
       const [result] = await connection.query<ResultSetHeader>(
         "INSERT INTO HechosRecientes (titulo, fecha, descripcion, link, conflictividadID) VALUES (?, ?, ?, ?, ?)",
-        [event.titulo, event.fecha, event.descripcion, event.link, event.conflictividad]
+        [event.titulo, event.fecha, event.descripcion, event.link, event.conflictividad.id]
       );
+
       if (result.affectedRows === 0) {
-        await connection.rollback();
-        return false;
+        throw new Error("No se pudo insertar el hecho reciente");
       }
+
       const recentEventID = result.insertId;
+
       if (munId.length > 0) {
         const placeholders = munId.map(() => "(?, ?)").join(", ");
         const values = munId.flatMap((id) => [id, recentEventID]);
+
         await connection.query(
           `INSERT INTO Municipio_HechosRecientes (municipioID, hechosRecientesID) VALUES ${placeholders}`,
           values
         );
       }
+
       await connection.commit();
-      return true;
-    } catch {
+
+      return {
+        ...event,
+        id: recentEventID,
+        municipios: munId,
+      };
+    } catch (error) {
       await connection.rollback();
-      return false;
+      throw error;
     } finally {
       connection.release();
     }
