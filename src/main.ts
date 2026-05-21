@@ -1,13 +1,14 @@
-import dotenv from "dotenv";
-import server from "./server";
+import dotenv from "dotenv"
+import server from "./server"
 
-dotenv.config();
+dotenv.config()
 
 function main() {
-  const port = server.get("port");
+  const port = server.get("port")
 
-  server.listen(port, "0.0.0.0", function () { });
-  console.log("Server on port", port);
+  server.listen(port, "127.0.0.1", function () {
+    console.log("Server on", `http://127.0.0.1:${port}`)
+  })
 }
 
-main();
+main()
