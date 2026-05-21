@@ -17,6 +17,7 @@ const server = express()
 
 const allowedOrigins = [
   "https://uac-oaxaca.xyz",
+  "https://www.uac-oaxaca.xyz",
   "http://localhost:5173",
   "http://localhost:8080"
 ]
