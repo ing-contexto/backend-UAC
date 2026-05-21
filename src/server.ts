@@ -42,15 +42,21 @@ server.use(
 
 server.use(express.json())
 
-server.use((req, _res, next) => {
-  console.log(`${new Date().toISOString()} ${req.method} ${req.originalUrl}`, {
-    ip: req.headers["cf-connecting-ip"] || req.ip,
-    origin: req.headers.origin,
-    userAgent: req.headers["user-agent"]
-  })
+server.use((req, res, next) => {
+  const startedAt = Date.now();
 
-  next()
-})
+  res.on("finish", () => {
+    console.log(`${new Date().toISOString()} ${req.method} ${req.originalUrl}`, {
+      status: res.statusCode,
+      durationMs: Date.now() - startedAt,
+      ip: req.headers["cf-connecting-ip"] || req.ip,
+      origin: req.headers.origin,
+      userAgent: req.headers["user-agent"]
+    });
+  });
+
+  next();
+});
 
 server.get("/api/v1/ping", (req, res) => {
   res.json({
