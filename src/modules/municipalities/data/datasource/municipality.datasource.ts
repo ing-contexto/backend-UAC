@@ -28,40 +28,78 @@ export default class MunicipalityDatasource {
   }
 
   async getMunicipalities(munId: number[]): Promise<Municipality[]> {
+    if (munId.length === 0) return [];
+
     const connection = await this.pool.getConnection();
+
     try {
       const [rows] = await connection.query(
         `SELECT 
-          m.ID AS clave,
-          m.nombre AS nombre,
-          d.nombre AS distrito,
-          r.nombre AS region,
-          m.archivoSistema AS archivoSistema,
-          GROUP_CONCAT(
-              DISTINCT mc.nombre
-              ORDER BY mc.nombre SEPARATOR '; '
-          ) AS colindantes,
-          GROUP_CONCAT(
-              DISTINCT hr.titulo
-              ORDER BY hr.fecha DESC SEPARATOR ' ||| '
-          ) AS hechos,
-          GROUP_CONCAT(
-              DISTINCT l.nombre
-              ORDER BY l.nombre SEPARATOR '; '
-          ) AS localidades
-        FROM Municipio m
-          INNER JOIN Distrito d ON m.distritoID = d.ID
-          INNER JOIN Region r ON d.regionID = r.ID
-          LEFT JOIN MunicipioColindante col ON m.ID = col.municipioID
-          LEFT JOIN Municipio mc ON col.colindanteID = mc.ID
-          LEFT JOIN Municipio_HechosRecientes mhr ON m.ID = mhr.municipioID
-          LEFT JOIN HechosRecientes hr ON mhr.hechosRecientesID = hr.ID
-          LEFT JOIN Localidad l ON l.municipioID = m.ID
-        WHERE m.ID IN (?)
-        GROUP BY m.ID, m.nombre, d.nombre, r.nombre, m.archivoSistema;`,
+        m.ID AS clave,
+        m.nombre AS nombre,
+        d.nombre AS distrito,
+        r.nombre AS region,
+        m.archivoSistema AS archivoSistema,
+        GROUP_CONCAT(
+          DISTINCT mc.nombre
+          ORDER BY mc.nombre SEPARATOR '; '
+        ) AS colindantes,
+        GROUP_CONCAT(
+          DISTINCT hr.titulo
+          ORDER BY hr.fecha DESC SEPARATOR ' ||| '
+        ) AS hechos,
+        GROUP_CONCAT(
+          DISTINCT l.nombre
+          ORDER BY l.nombre SEPARATOR '; '
+        ) AS localidades
+      FROM Municipio m
+        INNER JOIN Distrito d ON m.distritoID = d.ID
+        INNER JOIN Region r ON d.regionID = r.ID
+        LEFT JOIN MunicipioColindante col ON m.ID = col.municipioID
+        LEFT JOIN Municipio mc ON col.colindanteID = mc.ID
+        LEFT JOIN Municipio_HechosRecientes mhr ON m.ID = mhr.municipioID
+        LEFT JOIN HechosRecientes hr ON mhr.hechosRecientesID = hr.ID
+        LEFT JOIN Localidad l ON l.municipioID = m.ID
+      WHERE m.ID IN (?)
+      GROUP BY m.ID, m.nombre, d.nombre, r.nombre, m.archivoSistema;`,
         [munId]
       );
-      return rows as Municipality[];
+
+      const municipios = rows as Municipality[];
+
+      const [grupoRows] = await connection.query(
+        `SELECT 
+        mgc.municipioID AS municipioID,
+        gc.ID AS id,
+        gc.nombre AS nombre,
+        gc.tipo AS tipo,
+        gc.anio AS anio
+      FROM Municipio_GrupoCriminal mgc
+      INNER JOIN GrupoCriminal gc ON gc.ID = mgc.grupoCriminalID
+      WHERE mgc.municipioID IN (?)
+      ORDER BY mgc.municipioID, gc.anio DESC, gc.tipo, gc.nombre;`,
+        [munId]
+      );
+
+      const gruposPorMunicipio = new Map<number, any[]>();
+
+      for (const grupo of grupoRows as any[]) {
+        if (!gruposPorMunicipio.has(grupo.municipioID)) {
+          gruposPorMunicipio.set(grupo.municipioID, []);
+        }
+
+        gruposPorMunicipio.get(grupo.municipioID)!.push({
+          id: grupo.id,
+          nombre: grupo.nombre,
+          tipo: grupo.tipo,
+          anio: grupo.anio
+        });
+      }
+
+      return municipios.map((municipio) => ({
+        ...municipio,
+        gruposCriminales: gruposPorMunicipio.get(municipio.clave) ?? []
+      }));
     } finally {
       connection.release();
     }
