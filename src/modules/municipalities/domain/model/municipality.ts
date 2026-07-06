@@ -4,4 +4,5 @@ export default interface Municipality {
   distrito: string;
   region: string;
   archivoSistema?: string;
+  alertaGenero: boolean;
 }

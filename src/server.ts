@@ -19,7 +19,8 @@ const allowedOrigins = [
   "https://uac-oaxaca.xyz",
   "https://www.uac-oaxaca.xyz",
   "http://localhost:5173",
-  "http://localhost:8080"
+  "http://localhost:8080",
+  "https://hoppscotch.io"
 ]
 
 server.set("trust proxy", true)

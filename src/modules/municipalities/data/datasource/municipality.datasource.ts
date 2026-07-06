@@ -40,14 +40,11 @@ export default class MunicipalityDatasource {
         d.nombre AS distrito,
         r.nombre AS region,
         m.archivoSistema AS archivoSistema,
+        m.alerta AS alertaGenero,
         GROUP_CONCAT(
           DISTINCT mc.nombre
           ORDER BY mc.nombre SEPARATOR '; '
         ) AS colindantes,
-        GROUP_CONCAT(
-          DISTINCT hr.titulo
-          ORDER BY hr.fecha DESC SEPARATOR ' ||| '
-        ) AS hechos,
         GROUP_CONCAT(
           DISTINCT l.nombre
           ORDER BY l.nombre SEPARATOR '; '
@@ -57,15 +54,21 @@ export default class MunicipalityDatasource {
         INNER JOIN Region r ON d.regionID = r.ID
         LEFT JOIN MunicipioColindante col ON m.ID = col.municipioID
         LEFT JOIN Municipio mc ON col.colindanteID = mc.ID
-        LEFT JOIN Municipio_HechosRecientes mhr ON m.ID = mhr.municipioID
-        LEFT JOIN HechosRecientes hr ON mhr.hechosRecientesID = hr.ID
         LEFT JOIN Localidad l ON l.municipioID = m.ID
       WHERE m.ID IN (?)
-      GROUP BY m.ID, m.nombre, d.nombre, r.nombre, m.archivoSistema;`,
+      GROUP BY 
+        m.ID, 
+        m.nombre, 
+        d.nombre, 
+        r.nombre, 
+        m.archivoSistema,
+        m.alerta;`,
         [munId]
       );
 
-      const municipios = rows as Municipality[];
+      const municipios = rows as (Municipality & {
+        alertaGenero: 0 | 1 | boolean;
+      })[];
 
       const [grupoRows] = await connection.query(
         `SELECT 
@@ -98,6 +101,7 @@ export default class MunicipalityDatasource {
 
       return municipios.map((municipio) => ({
         ...municipio,
+        alertaGenero: Boolean(municipio.alertaGenero),
         gruposCriminales: gruposPorMunicipio.get(municipio.clave) ?? []
       }));
     } finally {
